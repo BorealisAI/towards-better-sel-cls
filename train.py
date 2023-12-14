@@ -569,7 +569,7 @@ def evaluate(testloader, model, use_cuda):
             sr_results[0].extend(list( -pred_logits.max(-1)[0]))
             sr_results[1].extend(list( predictions.eq(targets.data) ))
     abortion_scores, abortion_correct = torch.stack(abortion_results[0]), torch.stack(abortion_results[1])
-    sr_scores, sr_correct = torch.stack(abortion_results[0]), torch.stack(abortion_results[1])
+    sr_scores, sr_correct = torch.stack(sr_results[0]).cpu(), torch.stack(sr_results[1]).cpu()
     
     # Abstention Logit Results
     abortion_results = []
@@ -583,9 +583,9 @@ def evaluate(testloader, model, use_cuda):
     sr_results = []
     bisection_method(sr_scores, sr_correct, sr_results)
 
-    print("\Softmax\tResponse\tTest\tCoverage\tError")
+    print("\nSoftmax\tResponse\tTest\tCoverage\tError")
     for idx, _ in enumerate(sr_results):
-        print('{:.0f},\t{:.2f},\t\t{:.3f}'.format(expected_coverage[idx], abortion_results[idx][0]*100., (1 - abortion_results[idx][1])*100))
+        print('{:.0f},\t{:.2f},\t\t{:.3f}'.format(expected_coverage[idx], sr_results[idx][0]*100., (1 - sr_results[idx][1])*100))
 
     return
 
